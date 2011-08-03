@@ -1,7 +1,7 @@
-diff -ruN proxychains-3.1/proxychains/Makefile.in proxychains-3.1_resolv/proxychains/Makefile.in
---- proxychains-3.1/proxychains/Makefile.in	2006-03-15 10:16:59.000000000 -0600
-+++ proxychains-3.1_resolv/proxychains/Makefile.in	2011-06-16 13:17:20.000000000 -0500
-@@ -121,7 +121,7 @@
+diff -rupN proxychains-3.1/proxychains/Makefile.in proxychains-3.1.patched/proxychains/Makefile.in
+--- proxychains-3.1/proxychains/Makefile.in	2006-03-16 01:16:59.000000000 +0900
++++ proxychains-3.1.patched/proxychains/Makefile.in	2011-08-03 18:57:08.000000000 +0900
+@@ -121,7 +121,7 @@ LDFLAGS = @LDFLAGS@
  LIBS = @LIBS@
  libproxychains_la_DEPENDENCIES = 
  libproxychains_la_OBJECTS =  libproxychains.lo core.lo
@@ -10,9 +10,9 @@ diff -ruN proxychains-3.1/proxychains/Makefile.in proxychains-3.1_resolv/proxych
  COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
  LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
  CCLD = $(CC)
-diff -ruN proxychains-3.1/proxychains/core.c proxychains-3.1_resolv/proxychains/core.c
---- proxychains-3.1/proxychains/core.c	2006-03-15 10:16:59.000000000 -0600
-+++ proxychains-3.1_resolv/proxychains/core.c	2011-06-16 13:17:19.000000000 -0500
+diff -rupN proxychains-3.1/proxychains/core.c proxychains-3.1.patched/proxychains/core.c
+--- proxychains-3.1/proxychains/core.c	2006-03-16 01:16:59.000000000 +0900
++++ proxychains-3.1.patched/proxychains/core.c	2011-08-03 18:57:08.000000000 +0900
 @@ -35,12 +35,18 @@
  #include <fcntl.h>
  #include <time.h>
@@ -33,7 +33,7 @@ diff -ruN proxychains-3.1/proxychains/core.c proxychains-3.1_resolv/proxychains/
  static const char base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
  
  static void encode_base_64(char* src,char* dest,int max_len)
-@@ -159,13 +165,14 @@
+@@ -159,13 +165,14 @@ static int timed_connect(int sock, const
  
  	pfd[0].fd=sock;
  	pfd[0].events=POLLOUT;	
@@ -51,7 +51,7 @@ diff -ruN proxychains-3.1/proxychains/core.c proxychains-3.1_resolv/proxychains/
        		if(ret==1)
          	{
             		value_len=sizeof(int);
-@@ -388,14 +395,18 @@
+@@ -388,14 +395,18 @@ static int start_chain(int *fd, proxy_da
  				inet_ntoa(*(struct in_addr*)&pd->ip),
  				htons(pd->port));
  	pd->ps=PLAY_STATE;
@@ -70,7 +70,7 @@ diff -ruN proxychains-3.1/proxychains/core.c proxychains-3.1_resolv/proxychains/
  	pd->ps=BUSY_STATE;
  	return SUCCESS;
  error1:
-@@ -641,7 +652,7 @@
+@@ -641,7 +652,7 @@ struct hostent* proxy_gethostbyname(cons
  			dup2(pipe_fd[1],1);
  			//dup2(pipe_fd[1],2);
  		//	putenv("LD_PRELOAD=");
@@ -79,10 +79,10 @@ diff -ruN proxychains-3.1/proxychains/core.c proxychains-3.1_resolv/proxychains/
  			perror("can't exec proxyresolv");
  			exit(2);
  
-diff -ruN proxychains-3.1/proxychains/core.h proxychains-3.1_resolv/proxychains/core.h
---- proxychains-3.1/proxychains/core.h	2006-03-15 10:16:59.000000000 -0600
-+++ proxychains-3.1_resolv/proxychains/core.h	2011-06-16 13:17:19.000000000 -0500
-@@ -66,29 +66,28 @@
+diff -rupN proxychains-3.1/proxychains/core.h proxychains-3.1.patched/proxychains/core.h
+--- proxychains-3.1/proxychains/core.h	2006-03-16 01:16:59.000000000 +0900
++++ proxychains-3.1.patched/proxychains/core.h	2011-08-03 18:57:08.000000000 +0900
+@@ -66,29 +66,28 @@ int connect_proxy_chain (
  int proxychains_write_log(char *str,...);
  struct hostent* proxy_gethostbyname(const char *name);
  
@@ -119,9 +119,9 @@ diff -ruN proxychains-3.1/proxychains/core.h proxychains-3.1_resolv/proxychains/
  
  int proxy_getaddrinfo(const char *node, const char *service,
  		                const struct addrinfo *hints,
-diff -ruN proxychains-3.1/proxychains/libproxychains.c proxychains-3.1_resolv/proxychains/libproxychains.c
---- proxychains-3.1/proxychains/libproxychains.c	2006-03-15 10:16:59.000000000 -0600
-+++ proxychains-3.1_resolv/proxychains/libproxychains.c	2011-06-16 13:17:19.000000000 -0500
+diff -rupN proxychains-3.1/proxychains/libproxychains.c proxychains-3.1.patched/proxychains/libproxychains.c
+--- proxychains-3.1/proxychains/libproxychains.c	2006-03-16 01:16:59.000000000 +0900
++++ proxychains-3.1.patched/proxychains/libproxychains.c	2011-08-03 18:57:08.000000000 +0900
 @@ -32,7 +32,6 @@
  #include <sys/fcntl.h>
  #include <dlfcn.h>
@@ -130,7 +130,7 @@ diff -ruN proxychains-3.1/proxychains/libproxychains.c proxychains-3.1_resolv/pr
  #include "core.h"
  
  #define     satosin(x)      ((struct sockaddr_in *) &(x))
-@@ -57,6 +56,13 @@
+@@ -57,6 +56,13 @@ static inline void get_chain_data(
  	unsigned int *proxy_count,
  	chain_type *ct);
  
@@ -144,7 +144,7 @@ diff -ruN proxychains-3.1/proxychains/libproxychains.c proxychains-3.1_resolv/pr
  static void init_lib()
  {
  //	proxychains_write_log("ProxyChains-"VERSION
-@@ -291,7 +297,7 @@
+@@ -291,7 +297,7 @@ void freeaddrinfo(struct addrinfo *res)
  int getnameinfo (const struct sockaddr * sa,
  			socklen_t salen, char * host,
  			socklen_t hostlen, char * serv,
@@ -153,9 +153,9 @@ diff -ruN proxychains-3.1/proxychains/libproxychains.c proxychains-3.1_resolv/pr
  {
  	int ret = 0;
  	if(!init_l)
-diff -ruN proxychains-3.1/proxychains/proxychains proxychains-3.1_resolv/proxychains/proxychains
---- proxychains-3.1/proxychains/proxychains	2006-03-15 10:16:59.000000000 -0600
-+++ proxychains-3.1_resolv/proxychains/proxychains	2011-06-16 13:17:20.000000000 -0500
+diff -rupN proxychains-3.1/proxychains/proxychains proxychains-3.1.patched/proxychains/proxychains
+--- proxychains-3.1/proxychains/proxychains	2006-03-16 01:16:59.000000000 +0900
++++ proxychains-3.1.patched/proxychains/proxychains	2011-08-03 18:57:08.000000000 +0900
 @@ -1,9 +1,11 @@
  #!/bin/sh
  echo "ProxyChains-3.1 (http://proxychains.sf.net)"
@@ -169,10 +169,42 @@ diff -ruN proxychains-3.1/proxychains/proxychains proxychains-3.1_resolv/proxych
 +export DYLD_FORCE_FLAT_NAMESPACE=
 +export DYLD_INSERT_LIBRARIES=./.libs/libproxychains.3.0.0.dylib
  exec "$@"
-diff -ruN proxychains-3.1/proxychains/proxyresolv proxychains-3.1_resolv/proxychains/proxyresolv
---- proxychains-3.1/proxychains/proxyresolv	2006-03-15 10:16:59.000000000 -0600
-+++ proxychains-3.1_resolv/proxychains/proxyresolv	2011-06-16 13:18:51.000000000 -0500
-@@ -11,6 +11,6 @@
+diff -rupN proxychains-3.1/proxychains/proxychains.conf proxychains-3.1.patched/proxychains/proxychains.conf
+--- proxychains-3.1/proxychains/proxychains.conf	2006-03-16 01:16:59.000000000 +0900
++++ proxychains-3.1.patched/proxychains/proxychains.conf	2011-08-03 18:59:58.000000000 +0900
+@@ -1,7 +1,7 @@
+ # proxychains.conf  VER 3.1
+ #
+ #        HTTP, SOCKS4, SOCKS5 tunneling proxifier with DNS.
+-#	
++#
+ 
+ # The option below identifies how the ProxyList is treated.
+ # only one option should be uncommented at time,
+@@ -35,7 +35,7 @@ strict_chain
+ #quiet_mode
+ 
+ # Proxy DNS requests - no leak for DNS data
+-proxy_dns 
++#proxy_dns
+ 
+ # Some timeouts in milliseconds
+ tcp_read_time_out 15000
+@@ -51,8 +51,8 @@ tcp_connect_time_out 8000
+ #            	socks5	192.168.67.78	1080	lamer	secret
+ #		http	192.168.89.3	8080	justu	hidden
+ #	 	socks4	192.168.1.49	1080
+-#	        http	192.168.39.93	8080	
+-#		
++#	        http	192.168.39.93	8080
++#
+ #
+ #       proxy types: http, socks4, socks5
+ #        ( auth types supported: "basic"-http  "user/pass"-socks )
+diff -rupN proxychains-3.1/proxychains/proxyresolv proxychains-3.1.patched/proxychains/proxyresolv
+--- proxychains-3.1/proxychains/proxyresolv	2006-03-16 01:16:59.000000000 +0900
++++ proxychains-3.1.patched/proxychains/proxyresolv	2011-08-03 18:57:08.000000000 +0900
+@@ -11,6 +11,6 @@ if [ $# = 0 ] ; then
  	exit
  fi
  
