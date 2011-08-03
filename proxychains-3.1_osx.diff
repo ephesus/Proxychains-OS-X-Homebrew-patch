@@ -3,10 +3,10 @@ diff -ruN proxychains-3.1/proxychains/Makefile.in proxychains-3.1_resolv/proxych
 +++ proxychains-3.1_resolv/proxychains/Makefile.in	2011-06-16 13:17:20.000000000 -0500
 @@ -121,7 +121,7 @@
  LIBS = @LIBS@
- libproxychains_la_DEPENDENCIES = 
+ libproxychains_la_DEPENDENCIES =
  libproxychains_la_OBJECTS =  libproxychains.lo core.lo
 -CFLAGS = @CFLAGS@
-+CFLAGS = @CFLAGS@ -arch x86_64 -arch i386 
++CFLAGS = @CFLAGS@ -arch x86_64 -arch i386
  COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
  LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
  CCLD = $(CC)
@@ -19,7 +19,7 @@ diff -ruN proxychains-3.1/proxychains/core.c proxychains-3.1_resolv/proxychains/
  #include <stdarg.h>
 +#include <dlfcn.h>
  #include "core.h"
- 
+
  extern int tcp_read_time_out;
  extern int tcp_connect_time_out;
  extern int proxychains_quiet_mode;
@@ -29,16 +29,16 @@ diff -ruN proxychains-3.1/proxychains/core.c proxychains-3.1_resolv/proxychains/
 +extern freeaddrinfo_t true_freeaddrinfo;
 +extern getnameinfo_t true_getnameinfo;
 +extern gethostbyaddr_t true_gethostbyaddr;
-+ 
++
  static const char base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
- 
+
  static void encode_base_64(char* src,char* dest,int max_len)
 @@ -159,13 +165,14 @@
- 
+
  	pfd[0].fd=sock;
- 	pfd[0].events=POLLOUT;	
+ 	pfd[0].events=POLLOUT;
 -	fcntl(sock, F_SETFL, O_NONBLOCK);
-+	fcntl(sock, F_SETFL, O_NONBLOCK); 
++	fcntl(sock, F_SETFL, O_NONBLOCK);
    	ret=true_connect(sock, addr,  len);
 -//	printf("\nconnect ret=%d\n",ret);fflush(stdout);
 +//	printf("\nconnect ret=%d\n",ret); fflush(stdout);
@@ -78,45 +78,45 @@ diff -ruN proxychains-3.1/proxychains/core.c proxychains-3.1_resolv/proxychains/
 +			execlp("./proxyresolv","proxyresolv",name,NULL);
  			perror("can't exec proxyresolv");
  			exit(2);
- 
+
 diff -ruN proxychains-3.1/proxychains/core.h proxychains-3.1_resolv/proxychains/core.h
 --- proxychains-3.1/proxychains/core.h	2006-03-15 10:16:59.000000000 -0600
 +++ proxychains-3.1_resolv/proxychains/core.h	2011-06-16 13:17:19.000000000 -0500
 @@ -66,29 +66,28 @@
  int proxychains_write_log(char *str,...);
  struct hostent* proxy_gethostbyname(const char *name);
- 
+
 +typedef struct hostent* (*gethostbyname_t)(const char *);
 +static gethostbyname_t true_gethostbyname;
- 
+
  typedef int (*connect_t)(int, const struct sockaddr *, socklen_t);
 -connect_t true_connect;
 -
 -typedef struct hostent* (*gethostbyname_t)(const char *);
 -gethostbyname_t true_gethostbyname;
 +// connect_t true_connect;
- 
+
  typedef int (*getaddrinfo_t)(const char *, const char *,
  		const struct addrinfo *,
  		struct addrinfo **);
 -getaddrinfo_t true_getaddrinfo;
 +// getaddrinfo_t true_getaddrinfo;
- 
+
  typedef int (*freeaddrinfo_t)(struct addrinfo *);
 -freeaddrinfo_t true_freeaddrinfo;
 +// freeaddrinfo_t true_freeaddrinfo;
- 
+
  typedef int (*getnameinfo_t) (const struct sockaddr *,
  		socklen_t, char *,
  		socklen_t, char *,
  		socklen_t, unsigned int);
 -getnameinfo_t true_getnameinfo;
 +// getnameinfo_t true_getnameinfo;
- 
+
  typedef struct hostent *(*gethostbyaddr_t) (const void *, socklen_t, int);
 -gethostbyaddr_t true_gethostbyaddr;
 +// gethostbyaddr_t true_gethostbyaddr;
- 
+
  int proxy_getaddrinfo(const char *node, const char *service,
  		                const struct addrinfo *hints,
 diff -ruN proxychains-3.1/proxychains/libproxychains.c proxychains-3.1_resolv/proxychains/libproxychains.c
@@ -125,21 +125,20 @@ diff -ruN proxychains-3.1/proxychains/libproxychains.c proxychains-3.1_resolv/pr
 @@ -32,7 +32,6 @@
  #include <sys/fcntl.h>
  #include <dlfcn.h>
- 
+
 -
  #include "core.h"
- 
+
  #define     satosin(x)      ((struct sockaddr_in *) &(x))
 @@ -57,6 +56,13 @@
  	unsigned int *proxy_count,
  	chain_type *ct);
- 
+
 +connect_t true_connect;
 +getaddrinfo_t true_getaddrinfo;
 +freeaddrinfo_t true_freeaddrinfo;
 +getnameinfo_t true_getnameinfo;
 +gethostbyaddr_t true_gethostbyaddr;
-+
 +
  static void init_lib()
  {
@@ -175,7 +174,7 @@ diff -ruN proxychains-3.1/proxychains/proxyresolv proxychains-3.1_resolv/proxych
 @@ -11,6 +11,6 @@
  	exit
  fi
- 
+
 -
 -export LD_PRELOAD=libproxychains.so
 -dig $1 @$DNS_SERVER +tcp | awk '/A.+[0-9]+\.[0-9]+\.[0-9]/{print $5;}'
