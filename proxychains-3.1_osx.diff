@@ -167,7 +167,7 @@ diff -rupN proxychains-3.1/proxychains/proxychains proxychains-3.1.patched/proxy
  fi
 -export LD_PRELOAD=libproxychains.so
 +export DYLD_FORCE_FLAT_NAMESPACE=
-+export DYLD_INSERT_LIBRARIES=./.libs/libproxychains.3.0.0.dylib
++export DYLD_INSERT_LIBRARIES=$(brew --prefix proxychains)/lib/libproxychains.3.0.0.dylib
  exec "$@"
 diff -rupN proxychains-3.1/proxychains/proxychains.conf proxychains-3.1.patched/proxychains/proxychains.conf
 --- proxychains-3.1/proxychains/proxychains.conf	2006-03-16 01:16:59.000000000 +0900
@@ -212,5 +212,5 @@ diff -rupN proxychains-3.1/proxychains/proxyresolv proxychains-3.1.patched/proxy
 -export LD_PRELOAD=libproxychains.so
 -dig $1 @$DNS_SERVER +tcp | awk '/A.+[0-9]+\.[0-9]+\.[0-9]/{print $5;}'
 +export DYLD_FORCE_FLAT_NAMESPACE=
-+export DYLD_INSERT_LIBRARIES=./.libs/libproxychains.3.0.0.dylib
++export DYLD_INSERT_LIBRARIES=$(brew --prefix proxychains)/lib/libproxychains.3.0.0.dylib
 +dig $1 @$DNS_SERVER +tcp | awk '/^[^;].+A.+[0-9]+\.[0-9]+\.[0-9]/{print $5;}'
