@@ -1,0 +1,3 @@
+This patch is originally from http://chrootlabs.org/
+updated to use homebrew's library path instead of creating directories
+in $HOME
