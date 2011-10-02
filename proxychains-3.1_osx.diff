@@ -70,15 +70,6 @@ diff -rupN proxychains-3.1/proxychains/core.c proxychains-3.1.patched/proxychain
  	pd->ps=BUSY_STATE;
  	return SUCCESS;
  error1:
-@@ -641,7 +652,7 @@ struct hostent* proxy_gethostbyname(cons
- 			dup2(pipe_fd[1],1);
- 			//dup2(pipe_fd[1],2);
- 		//	putenv("LD_PRELOAD=");
--			execlp("proxyresolv","proxyresolv",name,NULL);
-+			execlp("./proxyresolv","proxyresolv",name,NULL);
- 			perror("can't exec proxyresolv");
- 			exit(2);
- 
 diff -rupN proxychains-3.1/proxychains/core.h proxychains-3.1.patched/proxychains/core.h
 --- proxychains-3.1/proxychains/core.h	2006-03-16 01:16:59.000000000 +0900
 +++ proxychains-3.1.patched/proxychains/core.h	2011-08-03 18:57:08.000000000 +0900
@@ -181,15 +172,6 @@ diff -rupN proxychains-3.1/proxychains/proxychains.conf proxychains-3.1.patched/
  
  # The option below identifies how the ProxyList is treated.
  # only one option should be uncommented at time,
-@@ -35,7 +35,7 @@ strict_chain
- #quiet_mode
- 
- # Proxy DNS requests - no leak for DNS data
--proxy_dns 
-+#proxy_dns
- 
- # Some timeouts in milliseconds
- tcp_read_time_out 15000
 @@ -51,8 +51,8 @@ tcp_connect_time_out 8000
  #            	socks5	192.168.67.78	1080	lamer	secret
  #		http	192.168.89.3	8080	justu	hidden
