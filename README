@@ -1,3 +1,6 @@
 This patch is originally from http://chrootlabs.org/
 updated to use homebrew's library path instead of creating directories
 in $HOME
+
+update 2015/05/14:
+Chrootlabs is gone, and proxychains-ng seems to be the new alternative.
